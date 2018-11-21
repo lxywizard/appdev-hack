@@ -1,0 +1,89 @@
+API SPEC:
+Expected Functionality: 
+    Create a sign up option for users. Store each user'saved events.
+    Allow the passing of passwords and Session Token and encryption (Not in this API yet)
+    Store the pre gathered free food events in the databse and send it out upon request.
+
+
+Request GET /api/
+Response: 
+    {
+    "Hello World"
+    }
+
+
+//This is to sign a user up:
+Request POST /api/user/
+Postbody(json):
+    {
+        "username": username
+        "password": password ecrypted
+    }
+Response:
+    {
+        "success": True,
+        "data":{
+            "id": <id>,
+            "username": <user input for username>,
+            "token": Session token
+        }
+    }
+
+
+Request GET /api/user/{id}/
+Response:
+    {
+        "success": True
+        "data":{
+            "id": <id>,
+            "username": <user input for username>,
+            "events": <an array of event IDs a person saves>
+        }
+    }
+
+//use to add an event to a user's list
+Request POST /api/user/{id}/events/
+Response:
+    {
+        "success": True
+        "data":{
+            "id": <id>,
+            "location": <location of the event>,
+            "time": <time of the event>
+        }
+    }
+
+//used to delete an event of id {id} from a user's List
+Request DELETE /api/user/{id}/event/{id}/
+Response:
+    {
+        "success": True
+        "data":{
+            "id": <id>,
+            "location": <location of the event>,
+            "time": <time of the event>
+        }
+    }
+
+
+
+//This is to get the default free food event store in the database
+Request GET /api/events/
+Response:
+    {
+        "success": True
+        "data":[
+            {
+                "id": 0,
+                "location": <location of the event>,
+                "time": <time of the event>
+            },
+            {
+                "id": 1,
+                "location": <location of the event>,
+                "time": <time of the event>
+            }
+        ]
+    }
+
+
