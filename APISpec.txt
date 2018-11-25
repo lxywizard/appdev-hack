@@ -11,25 +11,6 @@ Response:
     "Hello World"
     }
 
-
-//This is to sign a user up:
-Request POST /api/user/
-Postbody(json):
-    {
-        "username": username
-        "password": password ecrypted
-    }
-Response:
-    {
-        "success": True,
-        "data":{
-            "id": <id>,
-            "username": <user input for username>,
-            "token": Session token
-        }
-    }
-
-
 Request GET /api/user/{id}/
 Response:
     {
@@ -48,6 +29,7 @@ Response:
         "success": True
         "data":{
             "id": <id>,
+            "name": <name of the event>,
             "location": <location of the event>,
             "time": <time of the event>
         }
@@ -60,12 +42,11 @@ Response:
         "success": True
         "data":{
             "id": <id>,
+            "name": <name of the event>,
             "location": <location of the event>,
             "time": <time of the event>
         }
     }
-
-
 
 //This is to get the default free food event store in the database
 Request GET /api/events/
@@ -75,11 +56,13 @@ Response:
         "data":[
             {
                 "id": 0,
+                "name": <name of the event>,
                 "location": <location of the event>,
                 "time": <time of the event>
             },
             {
                 "id": 1,
+                "name": <name of the event>,
                 "location": <location of the event>,
                 "time": <time of the event>
             }
