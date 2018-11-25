@@ -1,8 +1,9 @@
 API SPEC:
 Expected Functionality: 
     Create a sign up option for users. Store each user'saved events.
-    Allow the passing of passwords and Session Token and encryption (Not in this API yet)
+    Allow the passing of passwords and Session Token and encryption 
     Store the pre gathered free food events in the databse and send it out upon request.
+    Finished API.
 
 
 Request GET /api/
@@ -24,6 +25,9 @@ Response:
 
 //use to add an event to a user's list
 Request POST /api/user/{id}/events/
+post_body: {
+    'id': event_id
+}
 Response:
     {
         "success": True
@@ -68,5 +72,55 @@ Response:
             }
         ]
     }
+
+Request POST /register/
+//used to register someone. No need for encryption, we handled that
+post_body{
+    'email': email,
+    'password': password
+    'username': username
+}
+
+Response:
+{
+    'session_token': user.session_token,
+    'session_expiration': exp.time,
+    'update_token': user.update_token
+}
+
+Request POST /session/ 
+//This is to update session when it is expired
+post_body:
+    header: {
+        'Authorization': update_token
+    }
+
+Response:
+{
+    'session_token': user.session_token,
+    'session_expiration': exp.time,
+    'update_token': user.update_token
+}
+
+Request POST /login/
+post_body:{
+    'email': email,
+    'password':password
+}
+
+Response:{
+    'session_token': user.session_token,
+    'session_expiration': str(user.session_expiration),
+    'update_token': user.update_token
+} //when successfuul, error message otherwise.
+
+
+Request GET /Secret/
+//Remember to put session Token on header under Authorization
+Response:{
+    'message': 'You have successfully implemented sessions.',
+    'id':user.id ,
+    'username': user.username
+}
 
 

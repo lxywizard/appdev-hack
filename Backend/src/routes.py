@@ -37,6 +37,7 @@ def register_account():
     post_body = json.loads(request.data)
     email = post_body.get('email')
     password = post_body.get('password')
+    username = post_body.get('username')
 
     if email is None or password is None:
         return json.dumps({'error': 'Invalid email or password'})
