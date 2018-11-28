@@ -3,15 +3,15 @@ import bcrypt
 import datetime
 import hashlib
 import os
-from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+
+
 
 db = SQLAlchemy()
 
-association_table = Table('association', Base.metadata,
-   Column('user_id', Integer, ForeignKey('user.id')),
-   Column('event_id', Integer, ForeignKey('event.id'))
+association_table = db.Table('association',
+   db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+   db.Column('event_id', db.Integer, db.ForeignKey('event.id'))
 )
 
 class User(db.Model):
@@ -77,6 +77,6 @@ class Event(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'location': self.locaction,
+            'location': self.location,
             'time': self.time
         }

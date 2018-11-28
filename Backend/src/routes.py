@@ -42,7 +42,7 @@ def register_account():
     if email is None or password is None:
         return json.dumps({'error': 'Invalid email or password'})
 
-    created, user = users_dao.create_user(email, password)
+    created, user = users_dao.create_user(email, password, username)
 
     if not created:
         return json.dumps({'error': 'User already exists.'})
@@ -128,18 +128,18 @@ def post_test_events():
 
 @app.route('/api/user/<int:user_id>/events/', methods = ['GET'])
 def get_events(user_id):
-    user = user_dao.get_user_by_id(user_id)
+    user = users_dao.get_user_by_id(user_id)
     if not user:
         return json.dumps({'error': 'Invalid User'})
     events= [event.serialize() for event in user.event]
     return json.dumps({
             'success': True, 
-            'data': events.serialize()
+            'data': events
         })
     
 @app.route('/api/user/<int:user_id>/events/', methods = ['POST'])
 def post_events(user_id):
-    user = user_dao.get_user_by_id(user_id)
+    user = users_dao.get_user_by_id(user_id)
     if not user:
         return json.dumps({'success': False, 'error': 'User not found!'}), 404 
     post_body = json.loads(request.data)
@@ -152,13 +152,13 @@ def post_events(user_id):
 
 @app.route('/api/user/<int:user_id>/events/<int:event_id>/', methods = ['DELETE'])
 def delete_event(user_id, event_id):
-    user = user_dao.get_user_by_id(user_id)
+    user = users_dao.get_user_by_id(user_id)
     if not user:
         return json.dumps({'success': False, 'error': 'User not found!'}), 404 
     event = Event.query.filter_by(id=event_id).first()
     if not event:
         return json.dumps({'success': False, 'error': 'Event not found!'}), 404 
-    db.session.delete(event)
+    user.event.remove(event)
     db.session.commit()
     return json.dumps({'success': True, 'data': event.serialize()})
 
