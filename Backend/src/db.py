@@ -3,8 +3,16 @@ import bcrypt
 import datetime
 import hashlib
 import os
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 db = SQLAlchemy()
+
+association_table = Table('association', Base.metadata,
+   Column('user_id', Integer, ForeignKey('user.id')),
+   Column('event_id', Integer, ForeignKey('event.id'))
+)
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -19,7 +27,8 @@ class User(db.Model):
     session_token = db.Column(db.String, nullable=False, unique=True)
     session_expiration = db.Column(db.DateTime, nullable=False)
     update_token = db.Column(db.String, nullable=False, unique=True)
-    event = db.relationship('Event')
+    event = db.relationship('Event', secondary = association_table)
+    
 
     def __init__(self, **kwargs):
         self.username = kwargs.get('username')
