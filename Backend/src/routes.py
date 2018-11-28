@@ -1,5 +1,5 @@
 import json
-from db import db, User
+from db import db, User, Event
 from flask import Flask, request
 import users_dao
 
@@ -112,12 +112,26 @@ def secret_message():
 def hello_world_again():
     return json.dumps({'message': 'Hello, World!'})
 
+
+# only for testing uses: generate event
+@app.route('/api/', methods = ['POST'])
+def post_test_events():
+    post_body = json.loads(request.data)
+    name = post_body.get('name')
+    location = post_body.get('location')
+    time = post_body.get('time')
+    event = Event(name = name, location = location, time = time)
+    db.session.add(event)
+    db.session.commit()
+    return json.dumps({'success': True, 'data': event.serialize()})
+
+
 @app.route('/api/user/<int:user_id>/events/', methods = ['GET'])
 def get_events(user_id):
     user = user_dao.get_user_by_id(user_id)
     if not user:
         return json.dumps({'error': 'Invalid User'})
-    events: [event.serialize() for event in user.event]
+    events= [event.serialize() for event in user.event]
     return json.dumps({
             'success': True, 
             'data': events.serialize()
@@ -132,7 +146,6 @@ def post_events(user_id):
     event_id = post_body.get('id')
     event = Event.query.filter_by(id=event_id).first()
     user.event.append(event)
-    db.session.add(user)
     db.session.commit()
     return json.dumps({'success': True, 'data': event.serialize()})
 
@@ -157,17 +170,7 @@ def get_all_events():
     res = {'success': True, 'data': [event.serialize() for event in events]} 
     return json.dumps(res), 200
     
-# only for testing uses: generate event
-@app.route('/test/events/', methods = ['POST'])
-def post_events():
-    post_body = json.loads(request.data)
-    name = post_body.get('name')
-    location = post_body.get('location')
-    time = post_body.get('time')
-    event = Event(name = name, location = location, time = time)
-    db.session.add(task)
-    db.session.commit()
-    return json.dumps({'success': True, 'data': event.serialize()})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
