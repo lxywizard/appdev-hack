@@ -137,8 +137,8 @@ def post_events(user_id):
     return json.dumps({'success': True, 'data': event.serialize()})
 
 
-@app.route('/api/user/<int:user_id>/events/<int:event_id>', methods = ['DELETE'])
-def delete_event(user_id, event_id)
+@app.route('/api/user/<int:user_id>/events/<int:event_id>/', methods = ['DELETE'])
+def delete_event(user_id, event_id):
     user = user_dao.get_user_by_id(user_id)
     if not user:
         return json.dumps({'success': False, 'error': 'User not found!'}), 404 
@@ -149,15 +149,25 @@ def delete_event(user_id, event_id)
     db.session.commit()
     return json.dumps({'success': True, 'data': event.serialize()})
 
+
+
 @app.route('/api/user/events/', methods = ['GET'])
-def get_all_events()
+def get_all_events():
     events = Event.query.all()
     res = {'success': True, 'data': [event.serialize() for event in events]} 
     return json.dumps(res), 200
     
-
-
-
+# only for testing uses: generate event
+@app.route('/test/events/', methods = ['POST'])
+def post_events():
+    post_body = json.loads(request.data)
+    name = post_body.get('name')
+    location = post_body.get('location')
+    time = post_body.get('time')
+    event = Event(name = name, location = location, time = time)
+    db.session.add(task)
+    db.session.commit()
+    return json.dumps({'success': True, 'data': event.serialize()})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
