@@ -12,68 +12,7 @@ Response:
     "Hello World"
     }
 
-Request GET /api/user/{id}/
-Response:
-    {
-        "success": True
-        "data":{
-            "id": <id>,
-            "username": <user input for username>,
-            "events": <an array of event IDs a person saves>
-        }
-    }
-
-//use to add an event to a user's list
-Request POST /api/user/{id}/events/
-post_body: {
-    'id': event_id
-}
-Response:
-    {
-        "success": True
-        "data":{
-            "id": <id>,
-            "name": <name of the event>,
-            "location": <location of the event>,
-            "time": <time of the event>
-        }
-    }
-
-//used to delete an event of id {id} from a user's List
-Request DELETE /api/user/{id}/event/{id}/
-Response:
-    {
-        "success": True
-        "data":{
-            "id": <id>,
-            "name": <name of the event>,
-            "location": <location of the event>,
-            "time": <time of the event>
-        }
-    }
-
-//This is to get the default free food event store in the database
-Request GET /api/events/
-Response:
-    {
-        "success": True
-        "data":[
-            {
-                "id": 0,
-                "name": <name of the event>,
-                "location": <location of the event>,
-                "time": <time of the event>
-            },
-            {
-                "id": 1,
-                "name": <name of the event>,
-                "location": <location of the event>,
-                "time": <time of the event>
-            }
-        ]
-    }
-
-Request POST /register/
+    Request POST /register/
 //used to register someone. No need for encryption, we handled that
 post_body{
     'email': email,
@@ -119,8 +58,75 @@ Request GET /Secret/
 //Remember to put session Token on header under Authorization
 Response:{
     'message': 'You have successfully implemented sessions.',
-    'id':user.id ,
     'username': user.username
 }
+
+
+
+Request GET /api/user/events/
+Response:
+    {
+        "success": True
+        "data":{
+            "id": <id>,
+            "username": <user input for username>,
+            "events": <an array of event IDs a person saves>
+        }
+    }
+
+//use to add an event to a user's list
+Request POST /api/user/{id}/events/
+post_body: {
+    'id': event_id
+}
+Response:
+    {
+        "success": True
+        "data":{
+            "id": <id>,
+            "name": <name of the event>,
+            "location": <location of the event>,
+            "time": <time of the event>
+        }
+    }
+
+//used to delete an event of id {id} from a user's List
+Request DELETE /api/user/events/{id}/
+Response:
+    {
+        "success": True
+        "data":{
+            "id": <id>,
+            "name": <name of the event>,
+            "location": <location of the event>,
+            "time": <time of the event>
+        }
+    }
+
+//This is to get the default free food event store in the database
+Request GET /api/events/
+Response:
+    {
+        "success": True
+        "data":[
+            {
+                "id": 0,
+                "name": <name of the event>,
+                "location": <location of the event>,
+                "time": <time of the event>,
+                "content": content,
+                "date": date
+            },
+            {
+                "id": 1,
+                "name": <name of the event>,
+                "location": <location of the event>,
+                "time": <time of the event>
+                "content": content,
+                "date": date
+            }
+        ]
+    }
+
 
 
