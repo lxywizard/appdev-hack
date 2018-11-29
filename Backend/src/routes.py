@@ -153,7 +153,7 @@ def get_events():
 
 
 @app.route('/api/user/events/', methods=['POST'])
-def post_events(user_id):
+def post_events():
     success, session_token = extract_token(request)
 
     if not success:
@@ -174,7 +174,7 @@ def post_events(user_id):
 
 
 @app.route('/api/user/events/<int:event_id>/', methods=['DELETE'])
-def delete_event(user_id, event_id):
+def delete_event(event_id):
     success, session_token = extract_token(request)
 
     if not success:
