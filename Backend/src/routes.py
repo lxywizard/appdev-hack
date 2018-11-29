@@ -108,7 +108,6 @@ def secret_message():
 
     return json.dumps({
         'message': 'You have successfully implemented sessions.',
-        'id': user.id,
         'username': user.username
     })
 
@@ -125,16 +124,25 @@ def post_test_events():
     name = post_body.get('name')
     location = post_body.get('location')
     time = post_body.get('time')
+    date = post_body.get('date')
     content = post_body.get('content')
-    event = Event(name=name, location=location, time=time, content=content)
+    event = Event(name=name, location=location, time=time, content=content, date = date)
     db.session.add(event)
     db.session.commit()
     return json.dumps({'success': True, 'data': event.serialize()})
 
 
-@app.route('/api/user/<int:user_id>/events/', methods=['GET'])
-def get_events(user_id):
-    user = users_dao.get_user_by_id(user_id)
+@app.route('/api/user/events/', methods=['GET'])
+def get_events():
+    success, session_token = extract_token(request)
+
+    if not success:
+        return session_token
+
+    user = users_dao.get_user_by_session_token(session_token)
+    if not user.verify_session_token(session_token):
+        return json.dumps({'error': 'Invalid session token.'})
+    
     if not user:
         return json.dumps({'error': 'Invalid User'})
     events = [event.serialize() for event in user.event]
@@ -144,11 +152,19 @@ def get_events(user_id):
     })
 
 
-@app.route('/api/user/<int:user_id>/events/', methods=['POST'])
+@app.route('/api/user/events/', methods=['POST'])
 def post_events(user_id):
-    user = users_dao.get_user_by_id(user_id)
+    success, session_token = extract_token(request)
+
+    if not success:
+        return session_token
+
+    user = users_dao.get_user_by_session_token(session_token)
+    if not user.verify_session_token(session_token):
+        return json.dumps({'error': 'Invalid session token.'})
+    
     if not user:
-        return json.dumps({'success': False, 'error': 'User not found!'}), 404
+        return json.dumps({'error': 'Invalid User'})
     post_body = json.loads(request.data)
     event_id = post_body.get('id')
     event = Event.query.filter_by(id=event_id).first()
@@ -157,9 +173,16 @@ def post_events(user_id):
     return json.dumps({'success': True, 'data': event.serialize()})
 
 
-@app.route('/api/user/<int:user_id>/events/<int:event_id>/', methods=['DELETE'])
+@app.route('/api/user/events/<int:event_id>/', methods=['DELETE'])
 def delete_event(user_id, event_id):
-    user = users_dao.get_user_by_id(user_id)
+    success, session_token = extract_token(request)
+
+    if not success:
+        return session_token
+
+    user = users_dao.get_user_by_session_token(session_token)
+    if not user.verify_session_token(session_token):
+        return json.dumps({'error': 'Invalid session token.'})
     if not user:
         return json.dumps({'success': False, 'error': 'User not found!'}), 404
     event = Event.query.filter_by(id=event_id).first()
@@ -170,7 +193,7 @@ def delete_event(user_id, event_id):
     return json.dumps({'success': True, 'data': event.serialize()})
 
 
-@app.route('/api/user/events/', methods=['GET'])
+@app.route('/api/events/', methods=['GET'])
 def get_all_events():
     events = Event.query.all()
     res = {'success': True, 'data': [event.serialize() for event in events]}
