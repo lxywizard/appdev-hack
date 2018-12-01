@@ -195,7 +195,7 @@ def delete_event(event_id):
 @app.route('/api/events/', methods=['GET'])
 def get_all_events():
     events = Event.query.all()
-    res = {'success': True, 'data': [event.serialize() for event in events]}
+    res = {'data': [event.serialize() for event in events]}
     return json.dumps(res), 200
 
 
