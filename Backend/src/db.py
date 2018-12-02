@@ -66,14 +66,20 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, default=0)
     location = db.Column(db.String, nullable=False)
+    longitude = db.Column(db.String, nullable = False)
+    latitude = db.Column(db.String, nullable = False)
     datetime = db.Column(db.String, nullable=False)
     content = db.Column(db.String, nullable=False)
+
 
     def __init__(self, **kwargs):
         self.name = kwargs.get('name', '')
         self.location = kwargs.get('location', '')
         self.datetime = kwargs.get('datetime', '')
         self.content = kwargs.get('content', '')
+        self.longitude = kwargs.get('longitude','')
+        self.latitude = kwargs.get('latitude','')
+        
 
 
     def serialize(self):
@@ -81,6 +87,8 @@ class Event(db.Model):
             'id': self.id,
             'name': self.name,
             'location': self.location,
+            'longitude': self.longitude,
+            'latitude': self.latitude,
             'datetime': self.datetime,
             'content': self.content
         }
