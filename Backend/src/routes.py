@@ -1,4 +1,5 @@
 import json
+import re
 from db import db, User, Event
 from flask import Flask, request
 import users_dao
@@ -127,6 +128,28 @@ def post_test_events():
     content = post_body.get('content')
     longitude = post_body.get('longitude')
     latitude = post_body.get('latitude')
+    event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
+    db.session.add(event)
+    db.session.commit()
+    return json.dumps({'success': True, 'data': event.serialize()})
+
+
+@app.route('/api/fromfb/', methods=['POST'])
+def post_fb_events():
+    post_body = json.loads(request.data)
+    name = post_body.get('name')
+    location = post_body.get('place')['name']
+    starttime = post_body.get('start_time')
+    endtime = post_body.get('end_time')
+    start = re.split(r'T', starttime)
+    end = re.split(r'T', endtime)
+    if start[0] == end[0]:
+        datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + re.match(r'\d{2}.\d{2}', end[1]).group()
+    else:
+        datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + end[0] + ' ' + re.match(r'\d{2}.\d{2}', end[1]).group()
+    content = post_body.get('description')
+    longitude = str(post_body.get('place')['location']['longitude'])
+    latitude = str(post_body.get('place')['location']['latitude'])
     event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
     db.session.add(event)
     db.session.commit()
