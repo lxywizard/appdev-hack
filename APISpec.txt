@@ -12,7 +12,31 @@ Response:
     "Hello World"
     }
 
-    Request POST /register/
+Request Post /api/
+//post a event to the database
+post_body: {
+        "name": <name of the event>,
+        "location": <location of the event>,
+        "datetime": <time of the event>,
+        "longitude": <longitude of the event>,
+        "latitude": <latitude of the event>,
+        "content": <content of the event>
+}
+Response:
+{
+    "success": True
+    "data":{
+        "id": <id>,
+        "name": <name of the event>,
+        "location": <location of the event>,
+        "datetime": <time of the event>,
+        "longitude": <longitude of the event>,
+        "latitude": <latitude of the event>,
+        "content": <content of the event>
+    }
+}
+
+Request POST /register/
 //used to register someone. No need for encryption, we handled that
 post_body{
     'email': email,
@@ -54,7 +78,7 @@ Response:{
 } //when successfuul, error message otherwise.
 
 
-Request GET /Secret/
+Request GET /secret/
 //Remember to put session Token on header under Authorization
 Response:{
     'message': 'You have successfully implemented sessions.',
@@ -86,7 +110,10 @@ Response:
             "id": <id>,
             "name": <name of the event>,
             "location": <location of the event>,
-            "time": <time of the event>
+            "datetime": <time of the event>,
+            "longitude": <longitude of the event>,
+            "latitude": <latitude of the event>,
+            "content": <content of the event>
         }
     }
 
@@ -99,7 +126,26 @@ Response:
             "id": <id>,
             "name": <name of the event>,
             "location": <location of the event>,
-            "time": <time of the event>
+            "datetime": <time of the event>,
+            "longitude": <longitude of the event>,
+            "latitude": <latitude of the event>,
+            "content": <content of the event>
+        }
+    }
+
+//used to delete an event from the database
+Request DELETE /api/events/{id}/
+Response:
+    {
+        "success": True
+        "data":{
+            "id": <id>,
+            "name": <name of the event>,
+            "location": <location of the event>,
+            "datetime": <time of the event>,
+            "longitude": <longitude of the event>,
+            "latitude": <latitude of the event>,
+            "content": <content of the event>
         }
     }
 
@@ -113,20 +159,99 @@ Response:
                 "id": 0,
                 "name": <name of the event>,
                 "location": <location of the event>,
-                "time": <time of the event>,
-                "content": content,
-                "date": date
+                "datetime": <time of the event>,
+                "longitude": <longitude of the event>,
+                "latitude": <latitude of the event>,
+                "content": <content of the event>
             },
             {
                 "id": 1,
                 "name": <name of the event>,
                 "location": <location of the event>,
-                "time": <time of the event>
-                "content": content,
-                "date": date
+                "datetime": <time of the event>,
+                "longitude": <longitude of the event>,
+                "latitude": <latitude of the event>,
+                "content": <content of the event>
             }
         ]
     }
+
+Request Post /api/events/
+//post a series of events to the database
+Response: 
+post_body: {
+        "data":[
+            {
+                "name": <name of the event>,
+                "location": <location of the event>,
+                "datetime": <time of the event>,
+                "longitude": <longitude of the event>,
+                "latitude": <latitude of the event>,
+                "content": <content of the event>
+            },
+            {
+                "name": <name of the event>,
+                "location": <location of the event>,
+                "datetime": <time of the event>,
+                "longitude": <longitude of the event>,
+                "latitude": <latitude of the event>,
+                "content": <content of the event>
+            }
+        ]
+}
+Response:
+{
+    "success": True
+        "data":[
+            {
+                "id": 0,
+                "name": <name of the event>,
+                "location": <location of the event>,
+                "datetime": <time of the event>,
+                "longitude": <longitude of the event>,
+                "latitude": <latitude of the event>,
+                "content": <content of the event>
+            },
+            {
+                "id": 1,
+                "name": <name of the event>,
+                "location": <location of the event>,
+                "datetime": <time of the event>,
+                "longitude": <longitude of the event>,
+                "latitude": <latitude of the event>,
+                "content": <content of the event>
+            }
+        ]
+}
+
+Request Post /api/fromfb/
+//post a event in the fbgraph event json form to the database
+post_body: {
+        "name": <name of the event>,
+        "place": {
+            "name": <location of the event>,
+            "location": {
+                "longitude": <longitude of the event>,
+                "latitude": <latitude of the event>
+            }
+        }
+        "start_time": <time of the event>,
+        "description": <content of the event>
+        
+}
+Response:
+{
+    "success": True
+    "data":{
+        "id": <id>,
+        "name": <name of the event>,
+        "location": <location of the event>,
+        "datetime": <time of the event>,
+        "longitude": <longitude of the event>,
+        "latitude": <latitude of the event>,
+        "content": <content of the event>
+    }
+}
 
 
 
