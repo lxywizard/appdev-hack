@@ -140,13 +140,14 @@ def post_fb_events():
     name = post_body.get('name')
     location = post_body.get('place')['name']
     starttime = post_body.get('start_time')
-    endtime = post_body.get('end_time')
+    # endtime = post_body.get('end_time')
     start = re.split(r'T', starttime)
-    end = re.split(r'T', endtime)
-    if start[0] == end[0]:
-        datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + re.match(r'\d{2}.\d{2}', end[1]).group()
-    else:
-        datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + end[0] + ' ' + re.match(r'\d{2}.\d{2}', end[1]).group()
+    # end = re.split(r'T', endtime)
+    # if start[0] == end[0]:
+        # datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + re.match(r'\d{2}.\d{2}', end[1]).group()
+    # else:
+        # datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + end[0] + ' ' + re.match(r'\d{2}.\d{2}', end[1]).group()
+    datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group()
     content = post_body.get('description')
     longitude = str(post_body.get('place')['location']['longitude'])
     latitude = str(post_body.get('place')['location']['latitude'])
@@ -177,7 +178,7 @@ def get_events():
 
 
 @app.route('/api/user/events/', methods=['POST'])
-def post_events():
+def post_event():
     success, session_token = extract_token(request)
 
     if not success:
@@ -197,8 +198,18 @@ def post_events():
     return json.dumps({'success': True, 'data': event.serialize()})
 
 
-@app.route('/api/user/events/<int:event_id>/', methods=['DELETE'])
+@app.route('/api/events/<int:event_id>/', methods=['DELETE'])
 def delete_event(event_id):
+    event = Event.query.filter_by(id=event_id).first()
+    if not event:
+        return json.dumps({'success': False, 'error': 'Event not found!'}), 404
+    db.session.delete(event)
+    db.session.commit()
+    return json.dumps({'success': True, 'data': event.serialize()})
+
+
+@app.route('/api/user/events/<int:event_id>/', methods=['DELETE'])
+def delete_user_event(event_id):
     success, session_token = extract_token(request)
 
     if not success:
@@ -213,6 +224,22 @@ def delete_event(event_id):
     if not event:
         return json.dumps({'success': False, 'error': 'Event not found!'}), 404
     user.event.remove(event)
+    db.session.commit()
+    return json.dumps({'success': True, 'data': event.serialize()})
+
+
+@app.route('/api/events/', methods=['POST'])
+def post_events():
+    post_body = json.loads(request.data)
+    for data in post_body.get('data'):    
+        name = data.get('name')
+        location = data.get('location')
+        datetime = data.get('datetime')
+        content = data.get('content')
+        longitude = data.get('longitude')
+        latitude = data.get('latitude')
+        event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
+        db.session.add(event)
     db.session.commit()
     return json.dumps({'success': True, 'data': event.serialize()})
 
