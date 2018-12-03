@@ -6,3 +6,5 @@ Major Function: We implemented a login system that allows user to store and dele
                 fetch facebook data. Currently the events are inputed by a regex file. However, the code for requesting facebook event 
                 will still be in the resipotory, facebook_bot.py (Credit: tudoanh https://github.com/tudoanh/python-facebook-bot)
                 and events_dao.py.
+
+IP address: 35.227.40.205/
