@@ -2,6 +2,7 @@ import json
 import re
 from db import db, User, Event
 from flask import Flask, request
+import helpers
 import users_dao
 
 db_filename = "ff.db"
@@ -118,43 +119,44 @@ def hello_world_again():
     return json.dumps({'message': 'Hello, World!'})
 
 
-# only for testing uses: generate event
 @app.route('/api/', methods=['POST'])
 def post_test_events():
     post_body = json.loads(request.data)
-    name = post_body.get('name')
-    location = post_body.get('location')
-    datetime = post_body.get('datetime')
-    content = post_body.get('content')
-    longitude = post_body.get('longitude')
-    latitude = post_body.get('latitude')
-    event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
-    db.session.add(event)
-    db.session.commit()
-    return json.dumps({'success': True, 'data': event.serialize()})
+    print(post_body.get('content'))
+    if helpers.has_food(post_body.get('content')):
+        name = post_body.get('name')
+        location = post_body.get('location')
+        datetime = post_body.get('datetime')
+        content = post_body.get('content')
+        longitude = post_body.get('longitude')
+        latitude = post_body.get('latitude')
+        event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
+        db.session.add(event)
+        db.session.commit()
+        return json.dumps({'success': True, 'data': event.serialize()})
+    else:
+        return json.dumps({'success': False, 'error': 'No food offered in event!'}), 406
 
 
+# post the events to our database based on events json returned by fbgraph
 @app.route('/api/fromfb/', methods=['POST'])
 def post_fb_events():
     post_body = json.loads(request.data)
-    name = post_body.get('name')
-    location = post_body.get('place')['name']
-    starttime = post_body.get('start_time')
-    # endtime = post_body.get('end_time')
-    start = re.split(r'T', starttime)
-    # end = re.split(r'T', endtime)
-    # if start[0] == end[0]:
-        # datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + re.match(r'\d{2}.\d{2}', end[1]).group()
-    # else:
-        # datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group() + '-' + end[0] + ' ' + re.match(r'\d{2}.\d{2}', end[1]).group()
-    datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group()
-    content = post_body.get('description')
-    longitude = str(post_body.get('place')['location']['longitude'])
-    latitude = str(post_body.get('place')['location']['latitude'])
-    event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
-    db.session.add(event)
-    db.session.commit()
-    return json.dumps({'success': True, 'data': event.serialize()})
+    if helpers.has_food(post_body.get('description')):
+        name = post_body.get('name')
+        location = post_body.get('place')['name']
+        starttime = post_body.get('start_time')
+        start = re.split(r'T', starttime)
+        datetime = start[0] + ' ' + re.match(r'\d{2}.\d{2}', start[1]).group()
+        content = post_body.get('description')
+        longitude = str(post_body.get('place')['location']['longitude'])
+        latitude = str(post_body.get('place')['location']['latitude'])
+        event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
+        db.session.add(event)
+        db.session.commit()
+        return json.dumps({'success': True, 'data': event.serialize()})
+    else:
+        return json.dumps({'success': False, 'error': 'No food offered in event!'}), 406
 
 
 @app.route('/api/user/events/', methods=['GET'])
@@ -187,15 +189,18 @@ def post_event():
     user = users_dao.get_user_by_session_token(session_token)
     if not user.verify_session_token(session_token):
         return json.dumps({'error': 'Invalid session token.'})
-    
+
     if not user:
         return json.dumps({'error': 'Invalid User'})
     post_body = json.loads(request.data)
-    event_id = post_body.get('id')
-    event = Event.query.filter_by(id=event_id).first()
-    user.event.append(event)
-    db.session.commit()
-    return json.dumps({'success': True, 'data': event.serialize()})
+    if helpers.has_food(post_body.get('content')):
+        event_id = post_body.get('id')
+        event = Event.query.filter_by(id=event_id).first()
+        user.event.append(event)
+        db.session.commit()
+        return json.dumps({'success': True, 'data': event.serialize()})
+    else:
+        return json.dumps({'success': False, 'error': 'No food offered in event!'}), 406
 
 
 @app.route('/api/events/<int:event_id>/', methods=['DELETE'])
@@ -231,15 +236,16 @@ def delete_user_event(event_id):
 @app.route('/api/events/', methods=['POST'])
 def post_events():
     post_body = json.loads(request.data)
-    for data in post_body.get('data'):    
-        name = data.get('name')
-        location = data.get('location')
-        datetime = data.get('datetime')
-        content = data.get('content')
-        longitude = data.get('longitude')
-        latitude = data.get('latitude')
-        event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
-        db.session.add(event)
+    for data in post_body.get('data'):
+        if helpers.has_food(data.get('content')):    
+            name = data.get('name')
+            location = data.get('location')
+            datetime = data.get('datetime')
+            content = data.get('content')
+            longitude = data.get('longitude')
+            latitude = data.get('latitude')
+            event = Event(name=name, location=location, datetime=datetime, content=content, longitude = longitude, latitude=latitude)
+            db.session.add(event)
     db.session.commit()
     return json.dumps({'success': True, 'data': event.serialize()})
 
